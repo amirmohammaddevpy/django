@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Code</title>
+    <style>
+        body {
+            background-color: #f5f7fa;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .verify-container {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 300px;
+        }
+        h2 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .code-input {
+            font-size: 18px;
+            letter-spacing: 8px;
+            text-align: center;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .code-input:focus {
+            border-color: #4a90e2;
+        }
+        button {
+            margin-top: 15px;
+            padding: 10px;
+            width: 100%;
+            background-color: #4a90e2;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover:not(:disabled) {
+            background-color: #357abd;
+        }
+        button:disabled {
+            background-color: #a0c4f7;
+            cursor: not-allowed;
+        }
+        .timer {
+            margin-top: 10px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<div class="verify-container">
+    <h2>Enter Verification Code</h2>
+    <form method="POST" action="{% url 'profile:verify' %}">
+        {% csrf_token %}
+        <input type="text" name="code" maxlength="5" placeholder="-----" class="code-input" required>
+        <button type="submit">Verify</button>
+    </form>
+    <div class="timer">
+        Resend code in <span id="time">02:00</span>
+    </div>
+    <a href="{% url 'profile:resend' %}"><button id="resend" disabled onclick="resendCode()">Resend Code</button></a>
+</div>
+
+<script>
+    let timeLeft = 120; // 2 minutes
+    const timerDisplay = document.getElementById('time');
+    const resendButton = document.getElementById('resend');
+
+    const countdown = setInterval(() => {
+        let minutes = Math.floor(timeLeft / 60);
+        let seconds = timeLeft % 60;
+        timerDisplay.textContent = `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+        timeLeft--;
+
+        if(timeLeft < 0) {
+            clearInterval(countdown);
+            resendButton.disabled = false;
+            timerDisplay.textContent = "00:00";
+        }
+    }, 1000);
+
+    function resendCode() {
+        alert("Resend code clicked!"); // اینجا می‌توانید درخواست واقعی برای ارسال دوباره کد بگذارید
+        resendButton.disabled = true;
+        timeLeft = 120;
+        const newCountdown = setInterval(() => {
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+            timeLeft--;
+            if(timeLeft < 0) {
+                clearInterval(newCountdown);
+                resendButton.disabled = false;
+                timerDisplay.textContent = "00:00";
+            }
+        }, 1000);
+    }
+</script>
+
+</body>
+</html>
