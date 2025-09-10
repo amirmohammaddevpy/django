@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-100">
+  <form action="{% url 'verify' %}" method="post" class="bg-white p-8 rounded-xl shadow-md w-full max-w-sm space-y-4">
+    {% csrf_token %}
+    <h2 class="text-2xl font-semibold text-gray-800 text-center">Enter Verification Code</h2>
+
+    {{ form.as_p }}
+
+    <input type="submit" value="Verify" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition duration-200">
+
+    <div class="text-center text-sm text-gray-600">
+      <span id="timer">Resend available in <span id="countdown">2:00</span></span>
+      <br>
+      <a id="resend-link" href="{% url 'resend_code' %}" class="text-blue-600 opacity-50 pointer-events-none transition duration-200">Resend Code</a>
+    </div>
+  </form>
+</div>
+
+<script>
+  let countdown = 120;
+  const countdownElement = document.getElementById("countdown");
+  const resendLink = document.getElementById("resend-link");
+  const timerText = document.getElementById("timer");
+
+  function formatTime(seconds) {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  }
+
+  countdownElement.textContent = formatTime(countdown);
+
+  const interval = setInterval(() => {
+    countdown--;
+    countdownElement.textContent = formatTime(countdown);
+
+    if (countdown <= 0) {
+      clearInterval(interval);
+      resendLink.classList.remove("opacity-50", "pointer-events-none");
+      resendLink.classList.add("hover:underline");
+      timerText.innerHTML = "";  // مخفی کردن پیام تایمر بعد از فعال شدن لینک
+    }
+  }, 1000);
+</script>
+{% endblock content %}

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+{% if request.user.username == obj.username %}
+<title>Checkout Page</title>
+
+<div class="max-w-4xl mx-auto mt-10 bg-white p-10 rounded-2xl shadow-2xl">
+  
+  <!-- Heading -->
+  <h2 class="text-3xl font-extrabold mb-8 text-gray-900 text-center tracking-wide">🛒 Checkout</h2>
+
+  <!-- Customer Info Section -->
+  <div class="mb-10">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-2xl font-semibold text-gray-800">Customer Information</h3>
+      <a href="{% url 'edite_profile_user' user %}" class="inline-block px-5 py-2 bg-gradient-to-r from-blue-600 to-blue-800 text-white text-sm font-medium rounded-lg hover:opacity-90 transition duration-300">
+        ✏️ Edit
+      </a>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-gray-700 text-lg">
+      <p><strong>👤 Full name:</strong> {{ obj.first_name }} {{ obj.last_name }}</p>
+      <p><strong>📧 Email:</strong> {{ obj.email }}</p>
+      <p><strong>📱 Phone:</strong> {{ user.phone }}</p>
+      <p><strong>🏠 Address:</strong> {{ user.address }}</p>
+    </div>
+  </div>
+
+  <!-- Order Summary Section -->
+  <div class="mb-10 bg-gray-50 p-6 rounded-xl border">
+    <h3 class="text-2xl font-semibold text-gray-800 mb-4">🧾 Order Summary</h3>
+    <div class="flex justify-between items-center text-xl font-bold text-gray-900">
+      <span>Total</span>
+      <span>{{ final_total }} $</span>
+    </div>
+  </div>
+
+  <!-- Discount Code Form -->
+  <form action="{% url 'checkout' user %}" method="POST" class="mb-10">
+    {% csrf_token %}
+    <label for="discount_code" class="block mb-3 text-lg font-medium text-gray-800">🎟️ Discount Code</label>
+    <div class="flex">
+      <div class="flex-grow">{{ form.as_p }}</div>
+      <button type="submit"
+              class="ml-3 px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition duration-300">
+        Apply
+      </button>
+    </div>
+  </form>
+
+  <!-- Payment Button -->
+  <div class="text-center">
+    <button class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-8 py-4 rounded-full text-xl font-bold shadow-lg transition duration-300">
+      💳 Pay Now
+    </button>
+  </div>
+</div>
+
+{% else %}
+<div class="text-center text-red-600 text-xl font-semibold mt-10">
+  🚫 You are not authorized to view this information.
+</div>
+{% endif %}
+{% endblock content %}

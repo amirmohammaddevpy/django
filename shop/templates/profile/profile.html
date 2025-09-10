@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <title>profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(to right, #f8fafc, #e0e7ff);
+      font-family: 'IRANSans', sans-serif;
+    }
+  </style>
+</head>
+{% if obj.username == request.user.username %}
+
+  <section class="w-full px-10 py-16 space-y-12">
+
+    <!-- نام و تصویر -->
+    <div class="flex items-center gap-8 flex-wrap">
+        {% if profile.image %}
+        <img src="{{ profile.image.url }}" class="w-28 h-28 rounded-full border-4 border-indigo-500 shadow-lg" alt="User Image">
+        {% else %}
+        <img src="{% static 'images/download.jfif' %}" class="w-28 h-28 rounded-full border-4 border-indigo-500 shadow-lg" alt="User Image">
+        {% endif %}
+
+      <div>
+        <h1 class="text-3xl font-bold text-indigo-700">{{ obj.username }}</h1>
+        <p class="text-gray-600 mt-2">{{ obj.date_joined }}</p>
+      </div>
+    </div>
+
+    <!-- اطلاعات کاربری -->
+    <div class="grid sm:grid-cols-2 gap-8">
+      <div>
+        <h2 class="text-xl font-semibold border-b pb-1 mb-4 text-indigo-600">Contact information</h2>
+        <p><strong>Email:</strong>{{ obj.email }}</p>
+        <p class="mt-2"><strong>Mobil:</strong>{{ profile.phone }}</p>
+      </div>
+      <div>
+        <h2 class="text-xl font-semibold border-b pb-1 mb-4 text-indigo-600">aderess:</h2>
+        <p>{{ profile.address }}</p>
+      </div>
+    </div>
+
+    <!-- بخش‌های عملکردی -->
+    {% if request.user.username == obj.username %}
+    <div class="flex flex-wrap gap-4 mt-10">
+      <a href="{% url 'cart' %}" class="bg-white border border-gray-200 shadow px-6 py-3 rounded-xl text-indigo-700 font-semibold hover:bg-indigo-50 transition">my orders</a>
+      <a href="{% url 'edite_profile_user' obj.username %}" class="bg-white border border-gray-200 shadow px-6 py-3 rounded-xl text-indigo-700 font-semibold hover:bg-indigo-50 transition">Edite profile</a>
+    </div>
+    {% else %}
+    <div></div>
+    {% endif %}
+
+  </section>
+  {% else %}
+  <div class="text-center text-red-600 text-xl font-semibold">
+    You are not authorized to view this information.
+  </div>
+  {% endif %}
+{% endblock content %}

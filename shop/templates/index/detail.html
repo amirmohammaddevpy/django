@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<!-- Product Details -->
+<div class="max-w-6xl mx-auto p-6 bg-white rounded-2xl shadow-lg mt-10 flex flex-col lg:flex-row gap-10">
+
+    <!-- Product Image -->
+    <div class="w-full lg:w-1/2">
+        <div class="aspect-[3/4] overflow-hidden rounded-xl">
+            <img src="{{ product.image.url }}" alt="{{ product.name }}"
+                 class="w-full h-full object-cover shadow-md">
+        </div>
+    </div>
+
+    <!-- Product Details -->
+    <div class="w-full lg:w-1/2 space-y-6">
+        <h1 class="text-3xl font-bold text-gray-800">{{ product.name }}</h1>
+
+        <p class="text-2xl font-semibold text-green-600">
+            ${{ product.price|floatformat:2 }}
+        </p>
+
+        <!-- Add to Cart Form -->
+        <form method="POST" action="{% url 'add' product.id %}" class="space-y-4">
+            {% csrf_token %}
+
+            <!-- Quantity Input -->
+            <div>
+                <label for="quantity" class="block text-gray-700 font-medium mb-1">Quantity:</label>
+                <input type="number" name="quantity" id="quantity" value="1" min="1"
+                       class="w-24 px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-4">
+                <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-xl shadow hover:bg-indigo-700 transition">
+                    Add to Cart
+                </button>
+                <a href="{% url 'list_product' %}" class="text-indigo-600 font-semibold hover:underline">
+                    ← Back to Products
+                </a>
+            </div>
+        </form>
+        <p class="text-gray-600 text-lg leading-relaxed">
+            {{ product.description }}
+        </p>
+    </div>
+</div>
+<!-- Related Products -->
+<div class="mt-12">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">🛍️ Related Products</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {% for item in similar_products %}
+        <div class="bg-white p-4 rounded-xl shadow hover:shadow-md transition">
+          <a href="{% url 'detail_product' item.slug %}">
+            <div class="aspect-[4/5] overflow-hidden rounded-md mb-3">
+              <img src="{{ item.image.url }}" alt="{{ item.name }}" class="w-full h-full object-cover">
+            </div>
+            <h3 class="text-lg font-semibold text-gray-800">{{ item.name }}</h3>
+            <p class="text-green-600 font-bold mt-1">${{ item.price|floatformat:2 }}</p>
+          </a>
+        </div>
+      {% empty %}
+        <p class="text-gray-500">No related products found.</p>
+      {% endfor %}
+    </div>
+  </div>
+  
+<!-- Comments Section -->
+<div class="max-w-4xl mx-auto mt-12 space-y-6">
+    <h2 class="text-2xl font-bold text-gray-800">Comments</h2>
+
+    {% for comment in comments %}
+    <div class="bg-gray-100 p-4 rounded-xl shadow-sm flex gap-4 items-start">
+
+        <!-- Comment Content -->
+        <div>
+            <p class="text-sm text-gray-500 font-semibold">
+                {{ comment.username }} - {{ comment.created }}
+            </p>
+            <p class="mt-1 text-gray-700">{{ comment.body }}</p>
+        </div>
+    </div>
+    {% empty %}
+    <p class="text-gray-500">No comments yet. Be the first to comment!</p>
+    {% endfor %}
+</div>
+{% if user.is_authenticated %}
+    <form action="{% url 'detail_product' product.slug %}" method="post" class="max-w-4xl mx-auto mt-6 bg-white p-6 rounded-2xl shadow space-y-4">
+        {% csrf_token %}
+
+        <label for="id_body" class="block text-gray-700 font-semibold text-lg">Your Comment</label>
+        <textarea name="body" id="id_body" rows="4"
+              class="w-full border border-gray-300 rounded-xl p-4 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="Write your thoughts about this product..."></textarea>
+
+        <button type="submit"
+            class="bg-indigo-600 text-white font-semibold px-6 py-3 rounded-xl shadow hover:bg-indigo-700 transition">
+        Submit Comment
+        </button>
+    </form>
+{% endif %}
+
+{% endblock %}

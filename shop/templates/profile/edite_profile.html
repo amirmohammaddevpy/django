@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+<form action="{% url 'edite_profile_user' user.username %}" method="POST" enctype="multipart/form-data" class="max-w-lg mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+    {% csrf_token %}
+    <h2 class="text-3xl font-bold mb-6 text-indigo-600 text-center">Edit Profile</h2>
+
+    {{ form.non_field_errors }}
+
+    {% for field in form %}
+        <div class="mb-5">
+            <label for="{{ field.id_for_label }}" class="block mb-2 font-semibold text-gray-700">{{ field.label }}</label>
+            {{ field|add_class:"w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-300" }}
+            {% if field.help_text %}
+                <p class="text-xs text-gray-400 mt-1">{{ field.help_text }}</p>
+            {% endif %}
+            {% for error in field.errors %}
+                <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endfor %}
+
+    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-md shadow-md transition duration-300">
+        Save Changes
+    </button>
+</form>
+{% endblock content %}

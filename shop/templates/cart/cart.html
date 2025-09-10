@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if request.user == user %}
+<div class="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow-xl">
+
+  <h1 class="text-3xl font-bold mb-6 text-gray-800">🛒 Shopping Cart</h1>
+
+  <div class="space-y-6">
+    {% for product in number_cart %}
+    <div class="flex items-center justify-between border-b pb-4">
+      <!-- Product Info -->
+      <a href="{% url 'detail_product' product.post.slug %}"><div class="flex items-center gap-4">
+        <img src="{{ product.post.image.url }}" alt="Product" class="w-20 h-20 object-cover rounded-xl">
+        <div>
+        </a>
+          <h2 class="text-lg font-semibold text-gray-700">Name: {{ product.post.name }}</h2>
+          <p class="text-sm text-gray-500">{{ product.post.description }}</p>
+        </div>
+      </div>
+
+      <!-- Price Info -->
+      <div class="flex items-center gap-8 text-right">
+        <p class="text-gray-600">Quantity: {{ product.quntity }}</p>
+        <p class="text-gray-600">Unit Price: {{ product.post.price }}</p>
+        <a href="{% url 'remove' product.id %}">
+          <button class="text-red-500 hover:text-red-700 transition">❌ Remove</button>
+        </a>
+      </div>
+    </div>
+    {% empty %}
+    <p class="text-gray-500">Your cart is empty.</p>
+    {% endfor %}
+  </div>
+
+  <!-- Grand Total -->
+  <div class="mt-10 flex justify-between items-center border-t pt-4">
+    <a href="{% url 'list_product' %}" class="text-indigo-600 hover:underline">← Continue shopping</a>
+    <div class="text-xl font-bold text-gray-800">
+      Grand Total: <span class="text-indigo-600">{{ total }}</span>
+    </div>
+  </div>
+
+  <!-- Checkout Button -->
+  {% if number_cart %}
+  <div class="mt-6 text-left">
+    <a href="{% url 'checkout' user %}" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition">
+      Continue to Checkout
+    </a>
+  </div>
+  {% endif %}
+
+</div>
+{% else %}
+<div class="text-center text-red-600 text-xl font-semibold">
+  You are not authorized to view this information.
+</div>
+{% endif %}
+{% endblock content %}
