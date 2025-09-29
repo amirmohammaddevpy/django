@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    .room-container {
+        display: grid;
+        grid-template-columns: 3fr 1fr ; /* چت سمت چپ، participants سمت راست */
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .participants {
+        background: #fff;
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        height: fit-content;
+    }
+
+    .comment-wrapper {
+        background: #fff;
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    #messageForm {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    #messageInput {
+        flex: 1;
+        padding: 8px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+    }
+
+    #sendBtn {
+        padding: 8px 16px;
+        border: none;
+        background: #007BFF;
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    #sendBtn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
+
+    #messagesWrapper {
+    height: 400px;              /* ارتفاع مشخص */
+    border: 1px solid #ccc;     /* قاب کلی */
+    border-radius: 10px;
+    padding: 10px;
+    background: #fafafa;
+    overflow-y: auto;           /* اسکرول عمودی */
+}
+
+#messagesContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;                  /* فاصله بین پیام‌ها */
+}
+
+.message-box {
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    max-width: 70%;
+}
+
+.conversation-header {
+    display: flex;
+    justify-content: space-between; /* Conversation سمت چپ، بقیه سمت راست */
+    align-items: center;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* فاصله بین Participants و دکمه‌ها */
+}
+
+.participants-count {
+    font-weight: 500;
+    color: #333;
+}
+
+.inline-form {
+    display: inline-block;
+}
+
+.conversation-header {
+    display: flex;
+    justify-content: space-between; /* Conversation سمت چپ، بقیه سمت راست */
+    align-items: center;
+}
+
+.header-right {
+    margin-left: auto; /* همه چیز سمت راست میره */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.participants-label {
+    font-weight: bold;
+}
+
+.participants-count {
+    font-weight: 500;
+    color: #333;
+}
+
+.inline-form {
+    display: inline-block;
+}
+
+.join-btn, .leave-btn {
+    padding: 5px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.join-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.leave-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+.participants {
+    position: absolute;  /* یا relative به والد */
+    top: 300px;           /* فاصله از بالا */
+    right: 20px;         /* فاصله از راست */
+    width: 345px;        /* عرض مشخص */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    background: #fafafa;
+}
+
+.participants h3 {
+    margin-top: 0;
+}
+
+.participants p {
+    margin: 5px 0;
+}
+
+</style>
+
+
+<div class="room-container">
+
+    <!-- Chat section -->
+    <div>
+        <h1 style="margin-bottom: 10px;">
+            {% if room.image%}
+            <img src="{{ room.image.url }}" 
+             alt="Room Image" 
+             height="150" 
+             width="150"
+             class="rounded-circle border shadow"> {{ room.name }} <a href="{% url 'update_room' room.id %}"><span>edit room</span></a>
+            {% else %}
+            {{ room.name }}
+            {% endif %}
+            
+        </h1>
+        <span>Member {{ member }}</span>
+        
+        <p style="margin-bottom: 20px; color: #555;">{{ room.description }}</p>
+
+        <div class="comment-wrapper">
+            <div class="conversation-header">
+                <h3>Conversation</h3>
+                <div class="header-right" >
+                    <span class="participants-count">Participants: {{ participants.count }}</span>
+                    
+                    {% if request.user in participants %}
+                    <form action="{% url 'leave' room.id %}" method="post" class="inline-form">
+                        {% csrf_token %}    
+                        <input type="submit" value="Leave" class="leave-btn">
+                    </form>
+                    {% else %}
+                    <form action="{% url 'join' room.id %}" method="post" class="inline-form">
+                        {% csrf_token %}  
+                        <input type="submit" value="Join" class="join-btn">
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        
+            <hr>
+            <div id="messagesWrapper">
+                <div id="messagesContainer">
+                    {% for message in room_messages %}
+                        {% if request.user == message.user %}
+                        <a href="{% url 'delete_message' message.id %}" class="delete-link">Delete</a>
+                        {% endif %}
+                        <small>@{{ message.user }} • {{ message.created|timesince }} ago</small>
+                        <p>{{ message.body }}</p>
+                    {% empty %}
+                    <p style="color:#777;">No messages yet. Be the first to say something!</p>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div>
+            {% if request.user.is_authenticated %}
+                {% if request.user in participants %}
+                <form id="messageForm" method="POST" action="{% url 'chat_room' room.id %}" >
+                    {% csrf_token %}
+                    <input type="text" name="body" id="messageInput" placeholder="Type your message..." autocomplete="off">
+                    <button type="submit" id="sendBtn" disabled>Send</button>
+                </form>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'login_register' %}">Login</a>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Participants section -->
+    <div class="participants">
+        <h3>Participants</h3>
+        <hr>
+        {% for user in participants %}
+        <p>@{{ user.username }}</p>
+        {% empty %}
+        <p style="color:#777;">No participants yet.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", () => {
+    const messagesWrapper = document.getElementById("messagesWrapper");
+
+    // اسکرول به آخر پیام‌ها
+    if (messagesWrapper) {
+        messagesWrapper.scrollTop = messagesWrapper.scrollHeight;
+    }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("messageForm");
+    const input = document.getElementById("messageInput");
+    const messagesContainer = document.getElementById("messagesContainer");
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const sendBtn = document.getElementById("sendBtn");
+
+    // کنترل فعال/غیرفعال بودن دکمه
+    input.addEventListener("input", () => {
+        sendBtn.disabled = input.value.trim() === "";
+    });
+
+    form.addEventListener("submit", function(e) {
+        e.preventDefault(); // جلوگیری از رفرش شدن صفحه
+
+        const message = input.value.trim();
+        if (!message) return;
+
+        sendBtn.disabled = true; // جلوگیری از اسپم
+
+        fetch("{% url 'chat_room' room.id %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken
+            },
+            body: JSON.stringify({ body: message })
+        })
+        .then(response => {
+            if (!response.ok) throw new Error("Network error");
+            return response.json();
+        })
+        .then(data => {
+            // ساخت پیام با همون استایل
+            const div = document.createElement("div");
+            div.classList.add("message");
+            div.innerHTML = `
+                ${data.can_delete ? `<a href="/delete_message/${data.id}/">Delete</a>` : ""}
+                <small>@${data.user} • just now</small>
+                <p>${data.body}</p>
+            `;
+            messagesContainer.appendChild(div);
+
+            // اسکرول به آخر
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // پاک کردن input و غیرفعال کردن دکمه
+            input.value = "";
+            sendBtn.disabled = true;
+        })
+        .catch(err => console.error(err));
+    });
+});
+
+
+
+</script>
+{% endblock content %}

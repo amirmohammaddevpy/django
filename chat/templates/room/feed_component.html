@@ -1,0 +1,59 @@
+{% if q %}
+{% for room in rooms %}
+
+<style>
+    .room-img {
+    height: 50px;
+    width: 50px;
+    object-fit: cover; /* تصویر رو قشنگ داخل کادر جا میده */
+    border-radius: 8px; /* لبه‌ها گرد میشن */
+}
+
+</style>
+
+<div class="room">
+    <div class="room-actions">
+        {% if request.user == room.host %}
+        <a href="{% url 'update_room' room.id %}">✏️ Edit</a>
+        <a href="{% url 'delete_room' room.id %}">🗑️ Delete</a>
+        {% else %}
+        {% endif %}
+    </div>
+    <span>Host: @{{ room.host.username }}</span>
+    {% if room.image %}
+    <h5><img src="{{ room.image.url }}" alt="{{ room.name }}" class="room-img"><a href="{% url 'chat_room' room.id %}">{{ room.name }}</a></h5>
+    {% else %}
+    <h5><a href="{% url 'chat_room' room.id %}">{{ room.name }}</a></h5>
+    {% endif %}
+
+    
+    <small>Topic: {{ room.topic }}</small>
+</div>
+{% endfor %}
+
+{% else %}
+
+{% for room in rooms %}
+    {% if request.user in room.participants.all %}
+        <div class="room">
+            <div class="room-actions">
+                {% if request.user == room.host %}
+                <a href="{% url 'update_room' room.id %}">✏️ Edit</a>
+                <a href="{% url 'delete_room' room.id %}">🗑️ Delete</a>
+                {% else %}
+                {% endif %}
+            </div>
+            <span>Host: @{{ room.host.username }}</span>
+            {% if room.image %}
+            <h5><img src="{{ room.image.url }}" alt="{{ room.name }}" class="room-img" height="50px" width="70px"><a href="{% url 'chat_room' room.id %}">{{ room.name }}</a></h5>
+            {% else %}
+            <h5><a href="{% url 'chat_room' room.id %}">{{ room.name }}</a></h5>
+            {% endif %}
+            <small>Topic: {{ room.topic }}</small>
+        </div>
+    {% endif %}
+{% empty %}
+    <p style="color: #777;">No rooms found.</p>
+{% endfor %}
+
+{% endif %}

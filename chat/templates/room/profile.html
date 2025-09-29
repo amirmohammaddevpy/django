@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<h1 class="profile-title">User: {{ user.username }}</h1>
+
+<!-- نمایش عکس پروفایل -->
+<div class="profile-header">
+    <a href="{% url 'update_image' user.id %}" class="update-btn">Update</a>
+    <div class="profile-image">
+        {% if image.image %}
+            <img src="{{ image.image.url }}" alt="{{ user.username }} profile" />
+        {% else %}
+            <img src="{% static 'image/default.png' %}" alt="default profile" />
+        {% endif %}
+    </div>
+</div>
+
+<div class="profile-container">
+    <div class="profile-card">
+        {% include "room/topic_component.html" %}
+    </div>
+
+    <div class="profile-card">
+        {% include "room/feed_component.html" %}
+    </div>
+
+    <div class="profile-card">
+        {% include "room/activity_component.html" %}
+    </div>
+</div>
+
+<style>
+    /* عنوان پروفایل */
+    .profile-title {
+        text-align: center;
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin-bottom: 25px;
+        color: #2c3e50;
+    }
+
+    /* هدر پروفایل */
+    .profile-header {
+        text-align: center;
+        margin-bottom: 30px;
+        position: relative;
+    }
+
+    .profile-header .update-btn {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        background: #3498db;
+        color: white;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+    .profile-header .update-btn:hover {
+        background: #2980b9;
+    }
+
+    /* عکس پروفایل */
+    .profile-image img {
+        width: 130px;
+        height: 130px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+        border: 4px solid #fff;
+    }
+
+    /* کانتینر سه ستونه */
+    .profile-container {
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr;
+        gap: 20px;
+        margin-top: 30px;
+    }
+
+    /* کارت‌ها */
+    .profile-card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .profile-card:hover {
+        transform: translateY(-4px);
+    }
+</style>
+{% endblock content %}

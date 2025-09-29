@@ -1,0 +1,10 @@
+<div class="topics-box p-3 mt-4">
+    <h3 class="mb-3">Browse Topics</h3>
+    <hr>
+    <a class="topic-link d-block mb-2" href="{% url 'rooms' %}">All</a>
+    {% for topic in topics %}
+        <a class="topic-link d-block mb-2" href="{% url 'rooms' %}?q={{topic.name}}">{{ topic.name }}</a>
+    {% endfor %}
+</div>
+
+

@@ -1,0 +1,162 @@
+/* Container اصلی */
+.room-container {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: 20px;
+    margin: 20px auto;
+    max-width: 1100px;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* اطلاعات روم */
+.room-container h1 {
+    font-size: 24px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.room-container h1 img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* توضیحات */
+.room-container p {
+    line-height: 1.5;
+}
+
+/* جعبه گفتگو */
+.comment-wrapper {
+    background: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* هدر گفتگو */
+.conversation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* پیام‌ها */
+.message {
+    padding: 10px;
+    margin: 8px 0;
+    background: #f5f7fa;
+    border-radius: 10px;
+    transition: transform 0.2s;
+}
+
+.message:hover {
+    transform: scale(1.01);
+    background: #ecf6ff;
+}
+
+.message small {
+    color: #777;
+    font-size: 12px;
+}
+
+.message p {
+    margin-top: 5px;
+    font-size: 15px;
+}
+
+/* فرم پیام */
+#messageForm {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+#messageInput {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    outline: none;
+    transition: border 0.2s;
+}
+
+#messageInput:focus {
+    border: 1px solid #3498db;
+}
+
+/* دکمه‌ها */
+button, .join-btn, .leave-btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s, transform 0.2s;
+}
+
+button {
+    background: #3498db;
+    color: #fff;
+}
+
+button:disabled {
+    background: #95a5a6 !important;
+    cursor: not-allowed;
+}
+
+button:hover:not(:disabled),
+.join-btn:hover,
+.leave-btn:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+/* دکمه Join و Leave */
+.join-btn {
+    background: #27ae60;
+    color: #fff;
+}
+
+.leave-btn {
+    background: #e74c3c;
+    color: #fff;
+}
+
+/* Participants */
+.participants {
+    background: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.participants p {
+    padding: 5px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+#sendBtn {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+    transition: all 0.2s ease;
+}
+
+#sendBtn.active {
+    background-color: #3498db;
+    cursor: pointer;
+}
+
+.message {
+    opacity: 0;
+    transform: translateY(5px);
+    transition: all 0.3s ease;
+}
+
+.message.show {
+    opacity: 1;
+    transform: translateY(0);
+}
